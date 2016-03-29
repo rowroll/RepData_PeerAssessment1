@@ -79,13 +79,13 @@ ggplot(totalStepsPerDay, aes(x=stepsPerDay)) +
 ```
 
 
-The mean total number of steps taken per day is then
+The **mean** total number of steps taken per day is then
 ```{r, echo=TRUE}
 mean(totalStepsPerDay$stepsPerDay)
 ```
 
 
-The median total number of steps taken per day is then
+The **median** total number of steps taken per day is then
 ```{r, echo=TRUE}
 median(totalStepsPerDay$stepsPerDay)
 ```
@@ -217,7 +217,7 @@ median(totalStepsPerDayInterp$stepsPerDayInterp)
 ```
 
 
-Unsurprisingly, The difference between the means is
+Unsurprisingly, the difference between the means is
 ```{r, echo=TRUE}
 mean(totalStepsPerDay$stepsPerDay) - mean(totalStepsPerDayInterp$stepsPerDayInterp)
 ```
@@ -286,7 +286,7 @@ plotWeekdays <- ggplot(meanStepsPerWeekdayIntervalInterp, aes(x=interval, y=step
 grid.arrange( plotWeekdays, plotWeekends, ncol=1)
 ```
 
-
+The plots suggest that walking behavior is different on weekdays versus weekends.
 
 
 
