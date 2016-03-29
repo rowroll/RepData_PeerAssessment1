@@ -1,11 +1,6 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-author: rowroll
-date: 29-Mar-2016
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
+rowroll  
+29-Mar-2016  
 
 
 ## Loading and preprocessing the data
@@ -20,7 +15,8 @@ Show any code that is needed to
 ******
 
 We begin by loading libraries we will use
-```{r results='hide', message=FALSE, warning=FALSE}
+
+```r
 library(dplyr)
 library(ggplot2)
 library(gridExtra)
@@ -29,20 +25,28 @@ library(lubridate)
 
 Next, we load in the data.  We assume the data file is local:
 
-```{r, echo=TRUE}
-actData <- read.csv("activity.csv")
 
+```r
+actData <- read.csv("activity.csv")
 ```
 
 Finally, we change the type of the date column to the POSIXct date format:
-```{r, echo=TRUE}
-actData$date <- ymd(actData$date)
 
+```r
+actData$date <- ymd(actData$date)
 ```
 
 This is what `actData` looks like:
-```{r, echo=TRUE}
+
+```r
 str(actData)
+```
+
+```
+## 'data.frame':	17568 obs. of  3 variables:
+##  $ steps   : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ date    : POSIXct, format: "2012-10-01" "2012-10-01" ...
+##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
 ```
 
 
@@ -59,35 +63,53 @@ For this part of the assignment, you can ignore the missing values in the datase
 ******
 
 To answer this question, we begin by finding the total number of steps taken per day
-```{r, echo=TRUE}
+
+```r
 totalStepsPerDay <- actData %>% group_by(date) %>%
   summarize(stepsPerDay = sum(steps, na.rm=TRUE))
 str(totalStepsPerDay)
+```
 
+```
+## Classes 'tbl_df', 'tbl' and 'data.frame':	61 obs. of  2 variables:
+##  $ date       : POSIXct, format: "2012-10-01" "2012-10-02" ...
+##  $ stepsPerDay: int  0 126 11352 12116 13294 15420 11015 0 12811 9900 ...
+##  - attr(*, "drop")= logi TRUE
 ```
 
 
 Here is the histogram of the number of steps taken per day
 
-```{r, echo=TRUE}
 
+```r
 ggplot(totalStepsPerDay, aes(x=stepsPerDay)) + 
   geom_histogram(binwidth=1000, fill="darkolivegreen4", alpha=0.6) +
   ggtitle("Histogram of total number of steps taken per day") +
   labs(x = "Total number of steps per day", y = "Frequency")
-
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-6-1.png) 
 
 
 The mean total number of steps taken per day is then
-```{r, echo=TRUE}
+
+```r
 mean(totalStepsPerDay$stepsPerDay)
+```
+
+```
+## [1] 9354.23
 ```
 
 
 The median total number of steps taken per day is then
-```{r, echo=TRUE}
+
+```r
 median(totalStepsPerDay$stepsPerDay)
+```
+
+```
+## [1] 10395
 ```
 
 
@@ -105,30 +127,43 @@ median(totalStepsPerDay$stepsPerDay)
 
 To answer this question, we begin by calculating the average number of steps per interval:
 
-```{r, echo=TRUE}
+
+```r
 meanStepsPerInterval <- actData %>% group_by(interval) %>%
   summarize(stepsPerInterval = mean(steps, na.rm=TRUE))
 str(meanStepsPerInterval)
+```
 
+```
+## Classes 'tbl_df', 'tbl' and 'data.frame':	288 obs. of  2 variables:
+##  $ interval        : int  0 5 10 15 20 25 30 35 40 45 ...
+##  $ stepsPerInterval: num  1.717 0.3396 0.1321 0.1509 0.0755 ...
+##  - attr(*, "drop")= logi TRUE
 ```
 
 
 We plot this average against time:
 
-```{r, echo=TRUE}
 
+```r
 ggplot(meanStepsPerInterval, aes(x=interval, y=stepsPerInterval)) + 
   geom_line(color="darkolivegreen") +
   ggtitle("Average number of steps per interval") +
   labs(x = "Interval", y = "Average number of steps")
-
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-10-1.png) 
 
 The interval with the maximum number of steps, on average over all the days in the dataset, is
 
-```{r, echo=TRUE}
+
+```r
 maxIndex <- which.max(meanStepsPerInterval$stepsPerInterval)
 meanStepsPerInterval$interval[maxIndex]
+```
+
+```
+## [1] 835
 ```
 
 
@@ -149,82 +184,134 @@ Note that there are a number of days/intervals where there are missing values (c
 
 We begin by finding the total number of rows with NAs:
 
-```{r, echo=TRUE}
+
+```r
 sum(is.na(actData$steps))
+```
+
+```
+## [1] 2304
 ```
 
 We use linear interpolation to fill in the missing values in the dataset.  Using `rule = 2` means that the value at the closest data extreme is used when NAs are on the edges.
 
-```{r, echo=TRUE}
+
+```r
 xAxis <- 5*(0:(nrow(actData)-1))
 stepsInterpolated = approx(x = xAxis, y = actData$steps, xout=xAxis, method="linear", rule=2)
 actData$stepsInterpolated <- stepsInterpolated$y
 ```
 
 We check to see if there are any NAs in the interpolated data.
-```{r, echo=TRUE}
+
+```r
 sum(is.na(actData$stepsInterpolated))
+```
+
+```
+## [1] 0
 ```
 
 As we can see, there are no NAs in the interpolated data.
 
 We also calculate how many steps were added to the dataset using our interpolation
 
-```{r, echo=TRUE}
+
+```r
 wasNA <- is.na(actData$steps)
 sum(actData$stepsInterpolated[wasNA])
+```
+
+```
+## [1] 0
 ```
 
 It appears that the NAs in the original data are all surrounded by rows with 0 steps, so **the interpolation adds zero new steps**.
 
 As requested, we create a new dataset, equal to the original dataset, but with the missing values filled in:
 
-```{r, echo=TRUE}
+
+```r
 actDataInterp <- select(actData, steps = stepsInterpolated, date, interval)
 str(actDataInterp)
 ```
 
+```
+## 'data.frame':	17568 obs. of  3 variables:
+##  $ steps   : num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ date    : POSIXct, format: "2012-10-01" "2012-10-01" ...
+##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
+```
+
 We recalculate the total number of steps per day, using the interpolated data
-```{r, echo=TRUE}
+
+```r
 totalStepsPerDayInterp <- actDataInterp %>% group_by(date) %>%
   summarize(stepsPerDayInterp = sum(steps, na.rm=TRUE))
 str(totalStepsPerDayInterp)
+```
 
+```
+## Classes 'tbl_df', 'tbl' and 'data.frame':	61 obs. of  2 variables:
+##  $ date             : POSIXct, format: "2012-10-01" "2012-10-02" ...
+##  $ stepsPerDayInterp: num  0 126 11352 12116 13294 ...
+##  - attr(*, "drop")= logi TRUE
 ```
 
 
 Here is the histogram of the number of steps taken per day
 
-```{r, echo=TRUE}
 
+```r
 ggplot(totalStepsPerDayInterp, aes(x=stepsPerDayInterp)) + 
   geom_histogram(binwidth=1000, fill="firebrick", alpha=0.6) +
   ggtitle("Histogram of total number of steps taken per day, interpolated data") +
   labs(x = "Total number of steps per day", y = "Frequency")
-
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-18-1.png) 
 
 
 The mean total number of steps taken per day is then
-```{r, echo=TRUE}
+
+```r
 mean(totalStepsPerDayInterp$stepsPerDayInterp)
+```
+
+```
+## [1] 9354.23
 ```
 
 
 The median total number of steps taken per day is then
-```{r, echo=TRUE}
+
+```r
 median(totalStepsPerDayInterp$stepsPerDayInterp)
+```
+
+```
+## [1] 10395
 ```
 
 
 Unsurprisingly, The difference between the **means** is
-```{r, echo=TRUE}
+
+```r
 mean(totalStepsPerDay$stepsPerDay) - mean(totalStepsPerDayInterp$stepsPerDayInterp)
 ```
 
+```
+## [1] 0
+```
+
 and, the difference between the **medians** is
-```{r, echo=TRUE}
+
+```r
 median(totalStepsPerDay$stepsPerDay) - median(totalStepsPerDayInterp$stepsPerDayInterp)
+```
+
+```
+## [1] 0
 ```
 
 As calculated previously, the total daily number of steps, in this particular dataset, **does not change** when linear interpolation is used to fill in missing values.
@@ -244,7 +331,8 @@ For this part the `weekdays()` function may be of some help here. Use the datase
 
 The function `wday()`  returns the day of the week as a decimal number (01-07, Sunday is 1) if `label=FALSE`.
 
-```{r, echo=TRUE}
+
+```r
 actDataInterp$dayNumber <- wday(actDataInterp$date, label=FALSE)
 weekEndIndex <- actDataInterp$dayNumber %in% c(1, 7) 
 
@@ -255,7 +343,8 @@ actDataInterp$dayType[weekEndIndex] = "Weekend"
 
 We begin by calculating the average number of steps per interval on weekdays:
 
-```{r, echo=TRUE}
+
+```r
 meanStepsPerWeekdayIntervalInterp <- actDataInterp %>% 
   filter(dayType == "Weekday")  %>%
   group_by(interval) %>%
@@ -270,8 +359,8 @@ meanStepsPerWeekendIntervalInterp <- actDataInterp %>%
 
 We plot this average against time:
 
-```{r, echo=TRUE}
 
+```r
 plotWeekends <- ggplot(meanStepsPerWeekendIntervalInterp, aes(x=interval, y=stepsPerWeekendInterval)) + 
   geom_line(color="firebrick") +
   ggtitle("Average number of steps per WEEKDAY interval") +
@@ -285,6 +374,8 @@ plotWeekdays <- ggplot(meanStepsPerWeekdayIntervalInterp, aes(x=interval, y=step
 
 grid.arrange( plotWeekdays, plotWeekends, ncol=1)
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-25-1.png) 
 
 
 
