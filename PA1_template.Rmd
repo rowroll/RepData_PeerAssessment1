@@ -286,7 +286,7 @@ plotWeekdays <- ggplot(meanStepsPerWeekdayIntervalInterp, aes(x=interval, y=step
 grid.arrange( plotWeekdays, plotWeekends, ncol=1)
 ```
 
-The plots suggest that walking behavior is different on weekdays versus weekends.
+The plots suggest that activity patterns are different on weekdays versus weekends.
 
 
 

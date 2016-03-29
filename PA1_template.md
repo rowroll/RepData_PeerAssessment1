@@ -377,7 +377,7 @@ grid.arrange( plotWeekdays, plotWeekends, ncol=1)
 
 ![](PA1_template_files/figure-html/unnamed-chunk-25-1.png) 
 
-The plots suggest that walking behavior is different on weekdays versus weekends.
+The plots suggest that activity patterns are different on weekdays versus weekends.
 
 
 
