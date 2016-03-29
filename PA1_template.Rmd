@@ -187,7 +187,7 @@ str(actDataInterp)
 We recalculate the total number of steps per day, using the interpolated data
 ```{r, echo=TRUE}
 totalStepsPerDayInterp <- actDataInterp %>% group_by(date) %>%
-  summarize(stepsPerDayInterp = sum(steps, na.rm=TRUE))
+  summarize(stepsPerDayInterp = sum(steps))
 str(totalStepsPerDayInterp)
 
 ```
@@ -205,24 +205,24 @@ ggplot(totalStepsPerDayInterp, aes(x=stepsPerDayInterp)) +
 ```
 
 
-The mean total number of steps taken per day is then
+The **mean** total number of steps taken per day is then
 ```{r, echo=TRUE}
 mean(totalStepsPerDayInterp$stepsPerDayInterp)
 ```
 
 
-The median total number of steps taken per day is then
+The **median** total number of steps taken per day is then
 ```{r, echo=TRUE}
 median(totalStepsPerDayInterp$stepsPerDayInterp)
 ```
 
 
-Unsurprisingly, The difference between the **means** is
+Unsurprisingly, The difference between the means is
 ```{r, echo=TRUE}
 mean(totalStepsPerDay$stepsPerDay) - mean(totalStepsPerDayInterp$stepsPerDayInterp)
 ```
 
-and, the difference between the **medians** is
+and, the difference between the medians is
 ```{r, echo=TRUE}
 median(totalStepsPerDay$stepsPerDay) - median(totalStepsPerDayInterp$stepsPerDayInterp)
 ```
@@ -274,13 +274,13 @@ We plot this average against time:
 
 plotWeekends <- ggplot(meanStepsPerWeekendIntervalInterp, aes(x=interval, y=stepsPerWeekendInterval)) + 
   geom_line(color="firebrick") +
-  ggtitle("Average number of steps per WEEKDAY interval") +
+  ggtitle("Average number of steps per interval on WEEKDAYS") +
   labs(x = "Interval", y = "Average number of steps")
 
 
 plotWeekdays <- ggplot(meanStepsPerWeekdayIntervalInterp, aes(x=interval, y=stepsPerWeekdayInterval)) + 
   geom_line(color="firebrick") +
-  ggtitle("Average number of steps per WEEKEND interval") +
+  ggtitle("Average number of steps per interval on WEEKENDS") +
   labs(x = "Interval", y = "Average number of steps")
 
 grid.arrange( plotWeekdays, plotWeekends, ncol=1)
